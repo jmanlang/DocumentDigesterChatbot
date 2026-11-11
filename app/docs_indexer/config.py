@@ -37,10 +37,7 @@ class Config:
     chroma_path: Path
     collection_name: str
     chroma_batch_size: int
-    state_path: Path
-    state_save_every: int
     build_metadata_path: Path
-    prune_missing: bool
     max_files: int
     roots: dict[str, Path]
 
@@ -71,12 +68,9 @@ class Config:
             chroma_path=BASE_DIR / os.getenv("CHROMA_PATH", "chroma_db"),
             collection_name=os.getenv("COLLECTION_NAME", "docs_collection"),
             chroma_batch_size=int(os.getenv("CHROMA_BATCH_SIZE", 32)),
-            state_path=BASE_DIR / os.getenv("STATE_PATH", "state.json"),
-            state_save_every=int(os.getenv("STATE_SAVE_EVERY", 100)),
             build_metadata_path=BASE_DIR / os.getenv(
                 "BUILD_METADATA_PATH", "build_metadata.json"
             ),
-            prune_missing=os.getenv("PRUNE_MISSING", "False").lower() == "true",
             max_files=int(os.getenv("MAX_FILES", 0)),  # 0 means no limit
             roots={
                 name: Path(val).resolve()
