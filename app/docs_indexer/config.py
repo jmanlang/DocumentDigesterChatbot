@@ -4,12 +4,9 @@ Setup all variables in the .env file and validate them.
 from __future__ import annotations
 
 import os
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from dotenv import load_dotenv
-
-from utils import compute_sha256
 
 # Get the base directory of the project
 BASE_DIR = Path(__file__).resolve().parents[3]
