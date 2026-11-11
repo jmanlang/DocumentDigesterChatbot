@@ -20,6 +20,8 @@ def embed_query(question: str):
         truncate_dim=768,
         normalize_embeddings=True,
     )
+
+    
 # query = "How do I reset my password?"
 # documents = [
 #     "Select Forgot password on the sign-in page to receive a reset link.",

@@ -18,6 +18,12 @@ chat_chain = build_chat_chain()
 
 @chat_router.post("/")
 async def ask_model(chat_request:ChatRequest):
-    embedding = await run_in_threadpool(embed_query, chat_request.question)
+    query_embedding = await run_in_threadpool(embed_query, chat_request.question)
+    
+    '''
+    TODO: Compare query embedding w/ document embeddings, retrieve relevant chunks, 
+    send chunks and query to chat model
+    '''
+    
     #return {"embedding": embedding.tolist()}
     return await chat_chain.ainvoke({"question":chat_request.question})
