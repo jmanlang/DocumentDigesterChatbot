@@ -1,19 +1,19 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.services.langchain_service import get_general_chain
+from app.services.langchain_service import build_chat_chain
 
-router = APIRouter(
+chat_router = APIRouter(
     prefix="/chat",
     tags=["chat"]
 )
 
-class ChatInputModel(BaseModel):
-    input:str
+class ChatRequest(BaseModel):
+    question:str
 
-chain = get_general_chain()
+chat_chain = build_chat_chain()
 
 
-@router.post("/")
-async def general_chat(chat:ChatInputModel):
-    return await chain.ainvoke({"input":chat.input})
+@chat_router.post("/")
+async def ask_model(chat_request:ChatRequest):
+    return await chat_chain.ainvoke({"question":chat_request.question})
