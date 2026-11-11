@@ -6,7 +6,8 @@ langchain-openai
 langchain-huggingface
 langchain-chroma
 langchain-text-splitters
-sentence-transformers
 streamlit
+torch
+sentence_transformers[image]
 requests
 chromadb
