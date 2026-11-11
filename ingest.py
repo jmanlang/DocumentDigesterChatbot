@@ -1,7 +1,3 @@
-# ingest.py
-# Run from: DocumentDigesterChatbot/
-# Usage: python ingest.py
-
 import re
 from pathlib import Path
 
@@ -10,9 +6,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-# ---------------------------------------------------------------
 # Configuration
-# ---------------------------------------------------------------
 RAW_FILE = Path("ingested_docs/Docker.md")
 CHROMA_DIR = "./chroma_db"
 COLLECTION = "docker_docs"
@@ -30,9 +24,8 @@ SKIP_HEADERS = (
 )
 
 
-# ---------------------------------------------------------------
+
 # Cleaning helpers
-# ---------------------------------------------------------------
 def strip_binary_blobs(text: str) -> str:
     """Remove table separators, base64 blobs, and other encoded junk."""
     lines = []
@@ -66,9 +59,7 @@ def should_skip_heading(metadata: dict) -> bool:
     return any(skip in heading for skip in SKIP_HEADERS)
 
 
-# ---------------------------------------------------------------
 # Phase 1: Parse pages
-# ---------------------------------------------------------------
 def parse_pages(raw_text: str):
     """Split the raw file into (url, body) page blocks and clean each."""
     pattern = r"----\s*\nurl:\s*(\S+)\s*\n----\s*\n(.*?)(?=----\s*\nurl:|$)"
@@ -87,9 +78,7 @@ def parse_pages(raw_text: str):
     return pages
 
 
-# ---------------------------------------------------------------
 # Phase 2: Semantic chunking
-# ---------------------------------------------------------------
 def chunk_pages(pages):
     header_splitter = MarkdownHeaderTextSplitter(
         headers_to_split_on=[
@@ -128,9 +117,7 @@ def chunk_pages(pages):
     return docs
 
 
-# ---------------------------------------------------------------
 # Phase 3: Embed and store
-# ---------------------------------------------------------------
 def build_index(chunks):
     embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
 
@@ -143,9 +130,7 @@ def build_index(chunks):
     return vectorstore
 
 
-# ---------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------
+
 def main():
     if not RAW_FILE.exists():
         raise FileNotFoundError(f"Not found: {RAW_FILE.resolve()}")
@@ -166,7 +151,7 @@ def main():
     vectorstore = build_index(chunks)
     print(f"Indexed {vectorstore._collection.count()} vectors into {CHROMA_DIR}")
 
-    # ---- Sanity check ----
+    # Sanity check
     print("\n=== Sanity check ===")
     results = vectorstore.similarity_search(
         "What does docker compose wait do?", k=3
@@ -176,7 +161,7 @@ def main():
         print(f"\n--- Result {i} | {source} ---")
         print(doc.page_content[:400])
 
-    # ---- Second check: verify provenance is populated ----
+    # Second check: verify provenance is populated
     print("\n=== Provenance check ===")
     empty_sources = sum(
         1 for d in chunks if not d.metadata.get("source_url")
