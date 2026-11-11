@@ -10,7 +10,7 @@ from langchain_core.documents import Document
 RAW_FILE = Path("ingested_docs/Docker.md")
 CHROMA_DIR = "./chroma_db"
 COLLECTION = "docker_docs"
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "unsloth/embeddinggemma-2"
 
 MIN_CHUNK_CHARS = 150      # drop fragments smaller than this
 MAX_CHUNK_CHARS = 1200     # hard cap — truncate anything bigger
