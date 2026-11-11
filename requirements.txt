@@ -8,4 +8,11 @@ fastapi
 uvicorn[standard]
 langchain-core
 langchain-ollama
+langchain-openai
+langchain-huggingface
+langchain-chroma
+langchain-text-splitters
+sentence-transformers
 streamlit
+requests
+chromadb
