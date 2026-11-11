@@ -2,6 +2,12 @@ fastapi
 uvicorn[standard]
 langchain-core
 langchain-ollama
+langchain-openai
+langchain-huggingface
+langchain-chroma
+langchain-text-splitters
 streamlit
 torch
 sentence_transformers[image]
+requests
+chromadb
