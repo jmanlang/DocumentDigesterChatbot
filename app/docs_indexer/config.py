@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 logger = logging.getLogger(__name__)
 
 # Get the base directory of the project
-BASE_DIR = Path(__file__).resolve().parents[3]
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 SOURCES = {
     "langchain_guides": "LANGCHAIN_GUIDES_DIR",
