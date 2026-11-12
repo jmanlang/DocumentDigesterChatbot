@@ -4,9 +4,12 @@ Setup all variables in the .env file and validate them.
 from __future__ import annotations
 
 import os
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 # Get the base directory of the project
 BASE_DIR = Path(__file__).resolve().parents[3]
@@ -52,7 +55,11 @@ class Config:
             provided, it defaults to the .env file in the base directory.
         """
         path = env_file if env_file is not None else BASE_DIR / ".env"
+        logger.info(f"ENV file loaded from: {path.as_uri()}")
+
         load_dotenv(dotenv_path=path, override=True)
+        logger.info("Loaded .env file...")
+
         config = cls(
             model_id=str(os.getenv("MODEL_ID")),
             model_revision=str(os.getenv("MODEL_REVISION")),
@@ -78,25 +85,37 @@ class Config:
                 if (val := os.getenv(env_var)) is not None
             },
         )
+        logger.info("Created configuration based on .env...")
 
         config.validate()
+        logger.info("Validated .env...")
+
         return config
 
     def validate(self) -> None:
         """
         Validate the configuration values. Raises ValueError if any value is invalid.
         """
+        logger.info("Validating .env values...")
         if self.embedding_dimension not in (128, 256, 512, 768):
+            logger.error(f"Invalid embedding dimension: {self.embedding_dimension}. \
+                         Must be one of 128, 256, 512, or 768.")
             raise ValueError("EMBEDDING_DIM must be 128, 256, 512, or 768")
         if not (0 <= self.chunk_overlap_tokens < self.chunk_target_tokens <= self.chunk_max_tokens <= 8192):
+            logger.error("Require 0 <= overlap < target <= max <= 8192")
             raise ValueError("Require 0 <= overlap < target <= max <= 8192")
         if self.chunk_target_tokens < 80 or self.chunk_max_tokens < 100:
+            logger.error("Chunk sizes are too small to preserve text and headings.")
             raise ValueError("Chunk sizes are too small to preserve text and headings")
         if self.model_dtype not in ("auto", "bfloat16", "float32"):
+            logger.error("MODEL_DTYPE must be auto, bfloat16, or float32")
             raise ValueError("MODEL_DTYPE must be auto, bfloat16, or float32")
         if self.device not in ("auto", "cpu", "cuda"):
+            logger.error("DEVICE must be auto, cpu, or cuda")
             raise ValueError("DEVICE must be auto, cpu, or cuda")
         if any(v < 1 for v in (self.embedding_batch_size, self.chroma_batch_size)):
+            logger.error("Batch sizes must be positive")
             raise ValueError("Batch sizes must be positive")
         if self.max_files < 0:
+            logger.error("MAX_FILES must be >= 0")
             raise ValueError("MAX_FILES must be >= 0")
