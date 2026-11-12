@@ -1,6 +1,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,linux,windows,macos,visualstudiocode,pycharm,vim
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,linux,windows,macos,visualstudiocode,pycharm,vim
 
+### Project Files and Directories
+data/chroma/*
 ### Linux ###
 *~
 
