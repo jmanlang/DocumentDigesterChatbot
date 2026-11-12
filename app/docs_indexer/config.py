@@ -48,6 +48,10 @@ class Config:
     build_metadata_path: Path
     max_files: int
     roots: dict[str, Path]
+    inference_backend: str
+    inference_model: str
+    inference_base_url: str
+    inference_temperature: float
 
     @classmethod
     def from_env(cls, env_file: Path | None = None) -> Config:
@@ -82,6 +86,10 @@ class Config:
             embedding_batch_size=int(os.getenv("EMBEDDING_BATCH_SIZE", 16)),
             normalize_embeddings=os.getenv("NORMALIZE_EMBEDDINGS", "True").lower() == "true",
             query_prompt_name=os.getenv("QUERY_PROMPT_NAME", "default"),
+            inference_backend=os.getenv("INFERENCE_BACKEND", "ollama"),
+            inference_model=os.getenv("INFERENCE_MODEL", "gemma4:e2b"),
+            inference_base_url=os.getenv("INFERENCE_BASE_URL", "http://localhost:11434"),
+            inference_temperature=float(os.getenv("INFERENCE_TEMPERATURE", "0.2")),
             chunk_target_tokens=int(os.getenv("CHUNK_TARGET_TOKENS", 512)),
             chunk_overlap_tokens=int(os.getenv("CHUNK_OVERLAP_TOKENS", 50)),
             chunk_max_tokens=int(os.getenv("CHUNK_MAX_TOKENS", 1024)),
@@ -110,6 +118,12 @@ class Config:
         Validate the configuration values. Raises ValueError if any value is invalid.
         """
         logger.info("Validating .env values...")
+        if self.inference_backend not in {"ollama", "llama_cpp"}:
+            raise ValueError("INFERENCE_BACKEND must be ollama or llama_cpp")
+        if not self.inference_base_url.startswith(("http://", "https://")):
+            raise ValueError("INFERENCE_BASE_URL must be a complete HTTP(S) URL")
+        if not self.inference_model.strip():
+            raise ValueError("INFERENCE_MODEL cannot be empty")
         if self.embedding_backend not in {"llama_cpp", "ollama", "sentence_transformers"}:
             logger.error("EMBEDDING_BACKEND must be llama_cpp, ollama, or sentence_transformers")
             raise ValueError("EMBEDDING_BACKEND must be llama_cpp, ollama, or sentence_transformers")

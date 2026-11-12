@@ -1,11 +1,24 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama import ChatOllama
 
-gemma_chat_model = ChatOllama(
-    model="gemma4:e2b",
-    base_url="http://localhost:11434",
-    temperature=.2
-)
+from app.docs_indexer.config import Config
+
+config = Config.from_env()
+if config.inference_backend == "ollama":
+    gemma_chat_model = ChatOllama(
+        model=config.inference_model,
+        base_url=config.inference_base_url,
+        temperature=config.inference_temperature,
+    )
+else:
+    from langchain_openai import ChatOpenAI
+
+    gemma_chat_model = ChatOpenAI(
+        model=config.inference_model,
+        base_url=config.inference_base_url,
+        temperature=config.inference_temperature,
+        use_responses_api=False,
+    )
 
 coder_assistant_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a chatbot that answers questions about "
