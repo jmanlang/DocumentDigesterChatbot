@@ -4,6 +4,7 @@
 ### Project Files and Directories
 data/chroma/*
 !data/chroma/.gitkeep
+build_metadata.json
 
 ### Linux ###
 *~
