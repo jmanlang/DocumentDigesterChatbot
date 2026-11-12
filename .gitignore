@@ -3,6 +3,8 @@
 
 ### Project Files and Directories
 data/chroma/*
+!data/chroma/.gitkeep
+
 ### Linux ###
 *~
 
