@@ -30,6 +30,11 @@ class Config:
     model_revision: str
     device: str
     model_dtype: str
+    embedding_backend: str
+    embedding_api_url: str
+    embedding_api_model: str
+    embedding_http_timeout: int
+    tokenizer_id: str
     embedding_dimension: int
     embedding_batch_size: int
     normalize_embeddings: bool
@@ -65,6 +70,11 @@ class Config:
             model_revision=str(os.getenv("MODEL_REVISION")),
             device=str(os.getenv("DEVICE")),
             model_dtype=str(os.getenv("MODEL_DTYPE")),
+            embedding_backend=str(os.getenv("EMBEDDING_BACKEND", "sentence_transformers")),
+            embedding_api_url=str(os.getenv("EMBEDDING_API_URL", "http://127.0.0.1:11434/api/embed")),
+            embedding_api_model=str(os.getenv("EMBEDDING_API_MODEL", "embeddinggemma-2-GGUF")),
+            embedding_http_timeout=int(os.getenv("EMBEDDING_HTTP_TIMEOUT", 180)),
+            tokenizer_id=str(os.getenv("TOKENIZER_ID", "unsloth/embeddinggemma-2-GGUF")),
             embedding_dimension=int(os.getenv("EMBEDDING_DIMENSION", 768)),
             embedding_batch_size=int(os.getenv("EMBEDDING_BATCH_SIZE", 16)),
             normalize_embeddings=os.getenv("NORMALIZE_EMBEDDINGS", "True").lower() == "true",
@@ -97,6 +107,12 @@ class Config:
         Validate the configuration values. Raises ValueError if any value is invalid.
         """
         logger.info("Validating .env values...")
+        if self.embedding_backend not in {"llama_cpp", "ollama", "sentence_transformers"}:
+            logger.error("EMBEDDING_BACKEND must be llama_cpp, ollama, or sentence_transformers")
+            raise ValueError("EMBEDDING_BACKEND must be llama_cpp, ollama, or sentence_transformers")
+        if self.embedding_backend in {"llama_cpp", "ollama"} and not self.embedding_api_url.startswith(("http://", "https://")):
+            logger.error("EMBEDDING_API_URL must be a complete HTTP(S) URL")
+            raise ValueError("EMBEDDING_API_URL must be a complete HTTP(S) URL")
         if self.embedding_dimension not in (128, 256, 512, 768):
             logger.error(f"Invalid embedding dimension: {self.embedding_dimension}. \
                          Must be one of 128, 256, 512, or 768.")
