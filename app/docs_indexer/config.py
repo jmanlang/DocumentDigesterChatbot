@@ -63,13 +63,16 @@ class Config:
         logger.info(f"ENV file loaded from: {path.as_uri()}")
 
         load_dotenv(dotenv_path=path, override=True)
+        
+        os.environ.setdefault("HF_HUB_OFFLINE", "1")
+        os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
         logger.info("Loaded .env file...")
 
         config = cls(
-            model_id=str(os.getenv("MODEL_ID")),
-            model_revision=str(os.getenv("MODEL_REVISION")),
-            device=str(os.getenv("DEVICE")),
-            model_dtype=str(os.getenv("MODEL_DTYPE")),
+            model_id=os.getenv("MODEL_ID", "unsloth/embeddinggemma-2"),
+            model_revision=os.getenv("MODEL_REVISION", "main"),
+            device=os.getenv("DEVICE", "auto"),
+            model_dtype=os.getenv("MODEL_DTYPE", "auto"),
             embedding_backend=str(os.getenv("EMBEDDING_BACKEND", "sentence_transformers")),
             embedding_api_url=str(os.getenv("EMBEDDING_API_URL", "http://127.0.0.1:11434/api/embed")),
             embedding_api_model=str(os.getenv("EMBEDDING_API_MODEL", "embeddinggemma-2-GGUF")),

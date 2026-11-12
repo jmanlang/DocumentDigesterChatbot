@@ -2,11 +2,14 @@
 Unified interface to use either SentenceTransformer, Ollama, or llama.cpp 
 for embedding creation.
 """
+from __future__ import annotations
 
 import numpy as np
 import logging
+from typing import TYPE_CHECKING
 
-from config import Config
+if TYPE_CHECKING:
+    from ..config import Config
 
 # Task prefixes from Google's EmbeddingGemma 2 model card.
 QUERY_PREFIXES = {
@@ -27,12 +30,13 @@ class EmbeddingClient:
             import torch
             from sentence_transformers import SentenceTransformer
 
-            device: str = "cuda" if torch.cuda.is_available() and config.device == "auto" \
-        else config.device
+            device = config.device
+            if device == "auto":
+                device = "cuda" if torch.cuda.is_available() else "cpu"
             logger.info(f"Using device: {device}")
 
             dtype: str = config.model_dtype if config.model_dtype != "auto" \
-                else "bfloat16" if torch.cuda.is_available() else "float32"
+                else "bfloat16" if device == "cuda" else "float32"
 
             model_dtype: torch.dtype = torch.bfloat16 if dtype == "bfloat16" else torch.float32
             logger.info(f"Using model dtype: {model_dtype}")
@@ -40,8 +44,9 @@ class EmbeddingClient:
                 config.model_id,
                 revision=config.model_revision,
                 device=device,
+                local_files_only=True,
                 model_kwargs={
-                    "torch_dtype": dtype
+                    "torch_dtype": model_dtype
                 },
                 config_kwargs={
                     "vision_config": None,
