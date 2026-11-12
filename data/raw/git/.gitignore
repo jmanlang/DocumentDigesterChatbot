@@ -1,0 +1,7 @@
+# Ignore everything in this directory but include the directory itself.
+# This is because we want to load the data from this directory, but don't want
+# to include any of the files in it in the repository because there could be
+# thousands of data files.
+
+*
+!.gitignore
