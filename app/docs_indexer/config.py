@@ -96,7 +96,7 @@ class Config:
             raise ValueError("MODEL_DTYPE must be auto, bfloat16, or float32")
         if self.device not in ("auto", "cpu", "cuda"):
             raise ValueError("DEVICE must be auto, cpu, or cuda")
-        if any(v < 1 for v in (self.embedding_batch_size, self.chroma_batch_size, self.state_save_every)):
-            raise ValueError("Batch sizes and STATE_SAVE_EVERY must be positive")
+        if any(v < 1 for v in (self.embedding_batch_size, self.chroma_batch_size)):
+            raise ValueError("Batch sizes must be positive")
         if self.max_files < 0:
             raise ValueError("MAX_FILES must be >= 0")
