@@ -68,7 +68,7 @@ def read_markdown_file(path: Path) -> tuple[str, str]:
     match = re.search(r"^#\s+(.+)$", text, flags=re.MULTILINE)
     title = match.group(1).strip() if match else path.stem.replace("_", " ").replace("-", " ")
 
-    return title, text
+    return title[:180], text
     
 
                 
