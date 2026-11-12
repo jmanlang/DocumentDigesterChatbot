@@ -1,10 +1,15 @@
 import streamlit as st
 import json
-from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 import uuid
 
 API_URL = "http://127.0.0.1:8000/chat/"
+
+SOURCES_MARKER = "\n\nRetrieved sources:\n\n"
+
+def split_sources(answer: str) -> tuple[str, str]:
+    text, _, sources = answer.partition(SOURCES_MARKER)
+    return text.strip(), sources.strip()
 
 def ask_backend(question: str) -> str:
     payload = json.dumps({"question": question}).encode()
@@ -22,13 +27,13 @@ def ask_backend(question: str) -> str:
         return f"Could not get an answer from the API: {error}"
 
     if isinstance(data, dict):
-        return data.get("content") or data.get("answer")
+        return data.get("content") or data.get("answer") or str(data)
     
     return str(data)
 
 
 
-st.set_page_config(page_title="CoderGPT", page_icon=":material/chat:")
+st.set_page_config(page_title="NeuroGPT", page_icon=":material/chat:")
 
 def new_chat():
     chat_id = str(uuid.uuid4())
@@ -42,7 +47,7 @@ if "chats" not in st.session_state:
 current_chat = st.session_state.chats[st.session_state.current_chat_id]
 
 with st.sidebar:
-    st.title("CoderGPT")
+    st.title("NeuroGPT")
     st.caption("Documentation assistant for Git, Docker, LangChain, and LangGraph")
 
     if st.button("New chat", icon=":material/add:", width="stretch"):
@@ -74,19 +79,22 @@ with st.sidebar:
             new_chat()
         st.rerun()
     
-    with st.expander("About CoderGPT"):
+    with st.expander("About NeuroGPT"):
         st.markdown(
             """
-            CoderGPT is your friendly assistant for understanding key software technologies.
+            NeuroGPT is your friendly assistant for understanding key software technologies.
             It specializes in: Git, Docker, LangChain, and LangGraph.
             """
         )
 
-st.header("Welcome to CoderGPT")
+st.header("Welcome to NeuroGPT")
 
 for message in current_chat["messages"]:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
+        if message.get("sources"):
+            with st.expander("Sources", icon=":material/menu_book:"):
+                st.markdown(message["sources"])
 
 
 if prompt := st.chat_input("Ask me anything technical"):
@@ -102,5 +110,8 @@ if prompt := st.chat_input("Ask me anything technical"):
     with st.spinner("Thinking..."):
         answer = ask_backend(prompt)
 
-    current_chat["messages"].append({"role": "assistant", "content": answer})
+    text, sources = split_sources(answer)
+    current_chat["messages"].append(
+        {"role": "assistant", "content": text, "sources": sources}
+    )
     st.rerun()
