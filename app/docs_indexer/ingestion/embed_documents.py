@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 from collections.abc import Iterator
 
-from app.docs_indexer.config import Config
+from config import Config
 
 logger = logging.getLogger(__name__)
 

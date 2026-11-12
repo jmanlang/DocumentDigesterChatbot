@@ -6,7 +6,7 @@ for embedding creation.
 import numpy as np
 import logging
 
-from app.docs_indexer.config import Config
+from config import Config
 
 # Task prefixes from Google's EmbeddingGemma 2 model card.
 QUERY_PREFIXES = {
